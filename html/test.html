@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>d3test</title>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+<a href="#" class="square_btn" id="start">BUTTON</a>
+
+<script type="text/javascript">
+
+    var width = 800;
+    var height = 800;
+
+    // svg領域の作成
+    var svg = d3.select("body")
+        .append("svg")
+        .attr({width:width, height:height});
+
+    class Point{
+        constructor(x, y){
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    //ライン描画関数
+    function draw(p1, p2){
+        svg.append("line")
+        .attr("x1",p1.x)
+        .attr("x2",p2.x)
+        .attr("y1",p1.y)
+        .attr("y2",p2.y)
+        .attr("stroke-width",1)
+        .attr("stroke","black");
+    }
+    function drawBold(p1, p2){
+        svg.append("line")
+        .attr("x1",p1.x)
+        .attr("x2",p2.x)
+        .attr("y1",p1.y)
+        .attr("y2",p2.y)
+        .attr("stroke-width",2)
+        .attr("stroke","black");
+    }
+    //フィールド定数
+    var p1_topleft = new Point(50, 50);
+    var p2_topleft = new Point(400, 50);
+    var field_height = 14;
+    var field_viewable = 12;
+    var field_width = 6;
+    var masu_px = 30;
+    //フィールドの作成
+    for(var i = 0; i < field_height + 1; i++){
+        if(i == 0 || i == field_height || i == field_height - field_viewable){
+            //1P horizontal
+            drawBold(new Point(p1_topleft.x, p1_topleft.y + i * masu_px),
+                new Point(p1_topleft.x + field_width * masu_px, p1_topleft.y + i * masu_px));
+            //2P horizontal
+            drawBold(new Point(p2_topleft.x, p2_topleft.y + i * masu_px),
+                new Point(p2_topleft.x + field_width * masu_px, p2_topleft.y + i * masu_px));
+        }else{
+            //1P horizontal
+            draw(new Point(p1_topleft.x, p1_topleft.y + i * masu_px),
+                new Point(p1_topleft.x + field_width * masu_px, p1_topleft.y + i * masu_px));
+            //2P horizontal
+            draw(new Point(p2_topleft.x, p2_topleft.y + i * masu_px),
+                new Point(p2_topleft.x + field_width * masu_px, p2_topleft.y + i * masu_px));
+        }
+
+    }
+    for(var i = 0;i < field_width + 1; i++){
+        if(i == 0 || i == field_width){
+            //1P vertical
+            drawBold(new Point(p1_topleft.x + i * masu_px, p1_topleft.y),
+                new Point(p1_topleft.x + i * masu_px, p1_topleft.y + field_height * masu_px));
+            //2P vertical
+            drawBold(new Point(p2_topleft.x + i * masu_px, p2_topleft.y),
+                new Point(p2_topleft.x + i * masu_px, p2_topleft.y + field_height * masu_px));
+        }else{
+            //1P vertical
+            draw(new Point(p1_topleft.x + i * masu_px, p1_topleft.y),
+                new Point(p1_topleft.x + i * masu_px, p1_topleft.y + field_height * masu_px));
+            //2P vertical
+            draw(new Point(p2_topleft.x + i * masu_px, p2_topleft.y),
+                new Point(p2_topleft.x + i * masu_px, p2_topleft.y + field_height * masu_px));
+        }
+
+    }
+
+
+    svg.append("circle")
+    .attr("cx",50)
+    .attr("cy",50)
+    .attr("r",20)
+    .attr("fill","green")
+    .attr("stroke-width",3)
+    .attr("stroke","orange");
+
+
+
+</script>
+
+</body>
+</html>
