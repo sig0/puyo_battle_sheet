@@ -8,15 +8,21 @@
 </head>
 <body>
 
-<a href="#" class="square_btn" id="start">BUTTON</a>
+<input type="button" class="square_btn" id="set" style="position: absolute; left: 200px; top: 500px"/>
+<input type="button" class="square_btn" id="step" style="position: absolute; left: 250px; top: 500px"/>
+<input class="file_input" id="file1" type="file" multiple style="position: absolute; left: 10px; top: 10px">
 
 <script type="text/javascript">
 
-    var width = 800;
+    var width = 300;
     var height = 800;
 
     // svg領域の作成
     var svg = d3.select("body")
+        .append("svg")
+        .attr({width:width, height:height});
+
+    var svg2p = d3.select("body")
         .append("svg")
         .attr({width:width, height:height});
 
@@ -26,10 +32,32 @@
             this.y = y;
         }
     }
+    if (window.File){
+        console.log('File APIは利用できます');
+    }
+    else {
+        console.log('File APIは利用できません');
+    }
+
+    var text_list = [];
+
+    $('.file_input').change(function(){
+      for (var i = 0; i < this.files.length; ++i){
+        if (this.files[i].type == 'text/plain'){
+          var reader = new FileReader();
+
+          reader.onload = function(e){
+            text_list.push(e.target.result);
+          }
+          reader.readAsText(this.files[i], 'UTF-8');
+        }
+      }
+    });
+
 
     //ライン描画関数
-    function draw(p1, p2){
-        svg.append("line")
+    function draw(p1, p2, obj){
+        obj.append("line")
         .attr("x1",p1.x)
         .attr("x2",p2.x)
         .attr("y1",p1.y)
@@ -37,8 +65,8 @@
         .attr("stroke-width",1)
         .attr("stroke","black");
     }
-    function drawBold(p1, p2){
-        svg.append("line")
+    function drawBold(p1, p2, obj){
+        obj.append("line")
         .attr("x1",p1.x)
         .attr("x2",p2.x)
         .attr("y1",p1.y)
@@ -47,59 +75,139 @@
         .attr("stroke","black");
     }
     //フィールド定数
-    var p1_topleft = new Point(50, 50);
-    var p2_topleft = new Point(400, 50);
+    var topleft = new Point(50, 50);
     var field_height = 14;
     var field_viewable = 12;
+    var field_diff = field_height - field_viewable;
     var field_width = 6;
     var masu_px = 30;
     //フィールドの作成
     for(var i = 0; i < field_height + 1; i++){
         if(i == 0 || i == field_height || i == field_height - field_viewable){
             //1P horizontal
-            drawBold(new Point(p1_topleft.x, p1_topleft.y + i * masu_px),
-                new Point(p1_topleft.x + field_width * masu_px, p1_topleft.y + i * masu_px));
+            drawBold(new Point(topleft.x, topleft.y + i * masu_px),
+                new Point(topleft.x + field_width * masu_px, topleft.y + i * masu_px), svg);
             //2P horizontal
-            drawBold(new Point(p2_topleft.x, p2_topleft.y + i * masu_px),
-                new Point(p2_topleft.x + field_width * masu_px, p2_topleft.y + i * masu_px));
+            drawBold(new Point(topleft.x, topleft.y + i * masu_px),
+                new Point(topleft.x + field_width * masu_px, topleft.y + i * masu_px), svg2p);
         }else{
             //1P horizontal
-            draw(new Point(p1_topleft.x, p1_topleft.y + i * masu_px),
-                new Point(p1_topleft.x + field_width * masu_px, p1_topleft.y + i * masu_px));
+            draw(new Point(topleft.x, topleft.y + i * masu_px),
+                new Point(topleft.x + field_width * masu_px, topleft.y + i * masu_px), svg);
             //2P horizontal
-            draw(new Point(p2_topleft.x, p2_topleft.y + i * masu_px),
-                new Point(p2_topleft.x + field_width * masu_px, p2_topleft.y + i * masu_px));
+            draw(new Point(topleft.x, topleft.y + i * masu_px),
+                new Point(topleft.x + field_width * masu_px, topleft.y + i * masu_px), svg2p);
         }
 
     }
     for(var i = 0;i < field_width + 1; i++){
         if(i == 0 || i == field_width){
             //1P vertical
-            drawBold(new Point(p1_topleft.x + i * masu_px, p1_topleft.y),
-                new Point(p1_topleft.x + i * masu_px, p1_topleft.y + field_height * masu_px));
+            drawBold(new Point(topleft.x + i * masu_px, topleft.y),
+                new Point(topleft.x + i * masu_px, topleft.y + field_height * masu_px), svg);
             //2P vertical
-            drawBold(new Point(p2_topleft.x + i * masu_px, p2_topleft.y),
-                new Point(p2_topleft.x + i * masu_px, p2_topleft.y + field_height * masu_px));
+            drawBold(new Point(topleft.x + i * masu_px, topleft.y),
+                new Point(topleft.x + i * masu_px, topleft.y + field_height * masu_px), svg2p);
         }else{
             //1P vertical
-            draw(new Point(p1_topleft.x + i * masu_px, p1_topleft.y),
-                new Point(p1_topleft.x + i * masu_px, p1_topleft.y + field_height * masu_px));
+            draw(new Point(topleft.x + i * masu_px, topleft.y),
+                new Point(topleft.x + i * masu_px, topleft.y + field_height * masu_px), svg);
             //2P vertical
-            draw(new Point(p2_topleft.x + i * masu_px, p2_topleft.y),
-                new Point(p2_topleft.x + i * masu_px, p2_topleft.y + field_height * masu_px));
+            draw(new Point(topleft.x + i * masu_px, topleft.y),
+                new Point(topleft.x + i * masu_px, topleft.y + field_height * masu_px), svg2p);
         }
 
     }
 
+    function color_detector(c){
+        if(c == "0"){
+            return "none";
+        }
+        if(c == "1"){
+            return "red";
+        }
+        if(c == "2"){
+            return "green";
+        }
+        if(c == "3"){
+            return "blue";
+        }
+        if(c == "4"){
+            return "yellow";
+        }
+        if(c == "5"){
+            return "gray";
+        }
+    }
+    var adjusted = new Point(topleft.x + masu_px / 2, topleft.y + masu_px / 2 + field_diff * masu_px);
 
-    svg.append("circle")
-    .attr("cx",50)
-    .attr("cy",50)
-    .attr("r",20)
-    .attr("fill","green")
-    .attr("stroke-width",3)
-    .attr("stroke","orange");
+    function parser(str){
+        list = str.split('\n');
+        result = [];
+        for(var i = 0; i < list.length; i++){
+            if(str.indexOf(' ') != -1){
+                var temp = list[i].split(' ');
+                result.push(temp[0]);
+                result.push(temp[2]);
+            }else{
+                result.push(list[i]);
+            }
+        }
+        console.log(result);
+        return result;
+    }
+    array1p = [];
+    array2p = [];
+    d3.select('#set').on('click', function(){
+        if(text_list.length == 0){
 
+        }else if(text_list.length == 1){
+            array1p = parser(text_list[0]);
+        }else if(text_list.length >= 2){
+            array1p = parser(text_list[0]);
+            array2p = parser(text_list[1]);
+        }
+    });
+    var index = 0;
+
+    d3.select('#step').on('click', function(){
+        index++;
+        data = array1p[index];
+        data2 = array2p[index];
+
+        svg
+        .selectAll("circle")
+        .remove();
+
+        svg2p
+        .selectAll("circle")
+        .remove();
+
+        puyo = svg
+        .selectAll("circle")
+        .data(data); // データをバインド。
+
+        puyo
+        .enter()
+        .append("circle")
+        .attr("r",14)
+        .attr("fill", function(d){return color_detector(d);})
+        .attr("cx", function(d,i){ return parseInt(i) % field_width * masu_px + adjusted.x; }) // データをcxに使う。
+        .attr("cy", function(d,i){ return Math.floor(parseInt(i) / field_width) * masu_px + adjusted.y; }); //　データのインデックスをcyに使う。
+
+        pu = svg2p
+        .selectAll("circle")
+        .data(data2); // データをバインド。
+
+        pu
+        .enter()
+        .append("circle")
+        .attr("r",14)
+        .attr("fill", function(d){return color_detector(d);})
+        .attr("cx", function(d,i){ return parseInt(i) % field_width * masu_px + adjusted.x; }) // データをcxに使う。
+        .attr("cy", function(d,i){ return Math.floor(parseInt(i) / field_width) * masu_px + adjusted.y; }); //　データのインデックスをcyに使う。
+
+    });
 
 
 </script>
